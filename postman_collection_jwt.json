@@ -1,0 +1,113 @@
+{
+	"info": {
+		"name": "Rapido Ride-Sharing API - JWT Auth",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register User",
+					"request": {
+						"method": "POST",
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/users/register/",
+							"host": ["127.0.0.1"],
+							"port": "8000",
+							"path": ["api", "users", "register"]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"testuser\",\n    \"password\": \"testpass123\",\n    \"email\": \"test@example.com\",\n    \"first_name\": \"Test\",\n    \"last_name\": \"User\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				},
+				{
+					"name": "Get JWT Token",
+					"request": {
+						"method": "POST",
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/token/",
+							"host": ["127.0.0.1"],
+							"port": "8000",
+							"path": ["api", "token"]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"testuser\",\n    \"password\": \"testpass123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				},
+				{
+					"name": "Refresh Token",
+					"request": {
+						"method": "POST",
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/token/refresh/",
+							"host": ["127.0.0.1"],
+							"port": "8000",
+							"path": ["api", "token", "refresh"]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"refresh\": \"your-refresh-token-here\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				},
+				{
+					"name": "Verify Token",
+					"request": {
+						"method": "POST",
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/token/verify/",
+							"host": ["127.0.0.1"],
+							"port": "8000",
+							"path": ["api", "token", "verify"]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": \"your-access-token-here\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{access_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "access_token",
+			"value": "your_jwt_token_here"
+		}
+	]
+}

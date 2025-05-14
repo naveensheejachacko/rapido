@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from rest_framework.test import APITestCase
 from rest_framework import status
+from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Ride, Location, UserProfile, RideStatus
 
 class UserTests(APITestCase):
@@ -17,6 +18,20 @@ class UserTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(User.objects.count(), 1)
         self.assertEqual(User.objects.get().username, 'testuser')
+
+    def test_jwt_authentication(self):
+        # Create user
+        User.objects.create_user(username='testuser', password='testpass123')
+        
+        # Get JWT tokens
+        response = self.client.post('/api/token/', {
+            'username': 'testuser',
+            'password': 'testpass123'
+        }, format='json')
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('access', response.data)
+        self.assertIn('refresh', response.data)
 
 class RideTests(APITestCase):
     def setUp(self):
@@ -44,8 +59,9 @@ class RideTests(APITestCase):
             address="Dropoff Location"
         )
 
-        # Authenticate as rider
-        self.client.force_authenticate(user=self.rider)
+        # Get JWT token for rider
+        refresh = RefreshToken.for_user(self.rider)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {refresh.access_token}')
 
     def test_create_ride(self):
         data = {

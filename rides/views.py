@@ -15,18 +15,24 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = [permissions.AllowAny]
 
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=['post'], permission_classes=[permissions.AllowAny], url_path='register')
     def register(self, request):
+        print("Registration endpoint hit with data:", request.data)  # Debug print
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
             UserProfile.objects.create(user=user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({
+                "status": "success",
+                "user": serializer.data,
+                "message": "User registered successfully"
+            }, status=status.HTTP_201_CREATED)
+        return Response({"status": "error", "errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 class RideViewSet(viewsets.ModelViewSet):
     queryset = Ride.objects.all()
     serializer_class = RideSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
         serializer.save(rider=self.request.user)
@@ -126,6 +132,7 @@ class RideViewSet(viewsets.ModelViewSet):
 class UserProfileViewSet(viewsets.ModelViewSet):
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     @action(detail=False, methods=['post'])
     def toggle_driver_status(self, request):
